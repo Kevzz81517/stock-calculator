@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Stock Calculation</title>
+	<style type="text/css">
+		* {
+		  font-family: arial, sans-serif;
+
+		}
+		table {
+		  border-collapse: collapse;
+		  width: 100%;
+		}
+
+		td, th {
+		  border: 1px solid #dddddd;
+		  text-align: left;
+		  padding: 8px;
+		}
+
+		tr:nth-child(even) {
+		  background-color: #dddddd;
+		}
+	</style>
+</head>
+<body>
+	<div id="data">
+	</div>
+
+<script type="text/javascript">
+	fetch('http://localhost:8080/api/v1/nse/io/nifty')
+  		.then(response => response.json())
+  		.then(data => {
+  			let finalBody = '<table><tr><th>Timestamp</th><th>Expiry</th><th>Option Type</th><th>Strike Price</th><th>Change In Open Interest</th><th>Last Price</th></tr>';
+  			data['CE Values'].forEach(
+  				ceValue => {
+  					finalBody += `<tr>${ceValue.split(',').reduce((a,b) => a + "<td>" + b + "</td>","")}</tr>`
+  				});
+  			finalBody = finalBody + `<tr><td></td><td>Total  =  </td><td>${data['CE Change In Open Interest']}</td></tr>`
+  			finalBody =  finalBody + '</table>'
+  			finalBody += '<br/><br/><table><tr><th>Timestamp</th><th>Expiry</th><th>Option Type</th><th>Strike Price</th><th>Change In Open Interest</th><th>Last Price</th></tr>';
+  			data['PE Values'].forEach(
+  				peValue => {
+  					finalBody += `<tr>${peValue.split(',').reduce((a,b) => a + "<td>" + b + "</td>","")}</tr>`
+  				});
+  			finalBody = finalBody + `<tr><td></td><td>Total  =  </td><td>${data['PE Change In Open Interest']}</td></tr>`
+  			finalBody = finalBody + '</table>'
+  			finalBody = finalBody + `<br /><br /><br /> <center>Is PUT > CALL : ${data['Is PE > CE']}</center>`
+  			document.getElementById("data").innerHTML = finalBody;
+  		});
+</script>
+</body>
+</html>
