@@ -24,14 +24,30 @@
 	</style>
 </head>
 <body>
+	<h2 id="nifty50"></h2>
+	<button ONCLICK="reloadPage()">RELOAD</button>
+	<input
+			type="number"
+			min="1"
+			max="30"
+			placeholder="Number of Records"
+			style="width: 200px;"
+			value="5"
+			id="numberOfRecords"
+			onchange="reloadPage()"
+	/>
 	<div id="data">
 	</div>
 
 <script type="text/javascript">
-	fetch('http://localhost:8080/api/v1/nse1/io/nifty')
+
+	function reloadPage() {
+		let numberOfRecords = document.getElementById("numberOfRecords").value;
+		fetch('http://localhost:8080/api/v1/nse1/io/nifty/' + numberOfRecords)
   		.then(response => response.json())
   		.then(data => {
-  			let finalBody = '<table><tr><th>Timestamp</th><th>Expiry</th><th>Option Type</th><th>Strike Price</th><th>Change In Open Interest</th><th>Last Price</th></tr>';
+  			document.getElementById("nifty50").innerHTML = "Nifty50 : " + data.Nifty50;
+  			let finalBody = `<center>Is PUT > CALL : ${data['Is PE > CE']}</center><br /><br /><table><tr><th>Timestamp</th><th>Expiry</th><th>Option Type</th><th>Strike Price</th><th>Change In Open Interest</th><th>Last Price</th><th>VWAP</th></tr>`;
   			data['CE Values'].forEach(
   				ceValue => {
   					finalBody += `<tr>${ceValue.split(',').reduce((a,b) => a + "<td>" + b + "</td>","")}</tr>`
@@ -45,9 +61,13 @@
   				});
   			finalBody = finalBody + `<tr><td></td><td>Total  =  </td><td>${data['PE Change In Open Interest']}</td></tr>`
   			finalBody = finalBody + '</table>'
-  			finalBody = finalBody + `<br /><br /><br /> <center>Is PUT > CALL : ${data['Is PE > CE']}</center>`
+  			finalBody = finalBody + `<br />`
   			document.getElementById("data").innerHTML = finalBody;
   		});
+	}
+
+	reloadPage();
+
 </script>
 </body>
 </html>

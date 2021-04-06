@@ -14,5 +14,5 @@ public interface DataService {
 
     IndexOptionData getIndexOptions(String name, String expiry, String optionType, String strikePrice);
 
-    HashMap<String, Object> evaluateIndicesData();
+    HashMap<String, Object> evaluateIndicesData(int records);
 }

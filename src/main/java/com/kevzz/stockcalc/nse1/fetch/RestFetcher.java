@@ -13,7 +13,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class RestFetcher {
-    public static final RestTemplate restClient = (new RestTemplateBuilder(new RestTemplateCustomizer[0])).requestFactory(() -> {
+    public static final RestTemplate restClient = (new RestTemplateBuilder()).requestFactory(() -> {
         return new HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
     }).interceptors(new ClientHttpRequestInterceptor[]{new ClientHttpRequestInterceptor() {
         public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
