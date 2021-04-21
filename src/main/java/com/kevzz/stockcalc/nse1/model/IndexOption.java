@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@MappedSuperclass
 public class IndexOption implements Serializable {
     private String annualisedVolatility;
     private String bestBuy;

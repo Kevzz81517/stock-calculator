@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kevzz.stockcalc.exception.ApplicationException;
 import com.kevzz.stockcalc.nse1.fetch.RestFetcher;
 import com.kevzz.stockcalc.nse1.model.*;
+import com.kevzz.stockcalc.repository.IndexOptionEntityRepository;
 import com.kevzz.stockcalc.util.DateFormattingUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,12 @@ import java.util.stream.LongStream;
 
 @Service
 public class DataServiceImpl implements DataService {
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private IndexOptionEntityRepository indexOptionEntityRepository;
 
     public IndiceData getIndices() {
 
@@ -70,6 +75,9 @@ public class DataServiceImpl implements DataService {
             return var10000 + ".00";
         }).forEach((strikePrice) -> {
             IndexOption indexOption = (IndexOption) this.getIndexOptions("NIFTY", expiry, "CE", strikePrice).getData().get(0);
+            this.indexOptionEntityRepository.save(
+                    new IndexOptionEntity(indexOption, String.valueOf(niftyPrice))
+            );
             float ceValue = 0.0F;
 
             try {
@@ -77,8 +85,23 @@ public class DataServiceImpl implements DataService {
             } catch (NumberFormatException var14) {
             }
 
-            ceValues.add(String.join(",", currentTime, expiry, "CE", strikePrice, indexOption.getChangeinOpenInterest().replaceAll(",", ""), indexOption.getLastPrice(), indexOption.getVwap().replaceAll(",", "")));
+            ceValues.add(
+                    String.join(
+                            ",",
+                            currentTime,
+                            expiry,
+                            "CE",
+                            strikePrice,
+                            indexOption.getChangeinOpenInterest().replaceAll(",", ""),
+                            indexOption.getOpenInterest().replaceAll(",", ""),
+                            indexOption.getLastPrice(),
+                            indexOption.getVwap().replaceAll(",", "")
+                    )
+            );
             indexOption = (IndexOption) this.getIndexOptions("NIFTY", expiry, "PE", strikePrice).getData().get(0);
+            this.indexOptionEntityRepository.save(
+                    new IndexOptionEntity(indexOption, String.valueOf(niftyPrice))
+            );
             float peValue = 0.0F;
 
             try {
@@ -86,7 +109,19 @@ public class DataServiceImpl implements DataService {
             } catch (NumberFormatException var13) {
             }
 
-            peValues.add(String.join(",", currentTime, expiry, "PE", strikePrice, indexOption.getChangeinOpenInterest().replaceAll(",", ""), indexOption.getLastPrice(), indexOption.getVwap().replaceAll(",", "")));
+            peValues.add(
+                    String.join(
+                            ",",
+                            currentTime,
+                            expiry,
+                            "PE",
+                            strikePrice,
+                            indexOption.getChangeinOpenInterest().replaceAll(",", ""),
+                            indexOption.getOpenInterest().replaceAll(",", ""),
+                            indexOption.getLastPrice(),
+                            indexOption.getVwap().replaceAll(",", "")
+                    )
+            );
             float finalCeValue = ceValue;
             totalCEChangeInInterest.updateAndGet((v) -> {
                 return v + finalCeValue;
